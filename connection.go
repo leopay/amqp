@@ -354,7 +354,7 @@ func (c *Connection) closeWith(err *Error) error {
 // is returned.
 func (c *Connection) IsClosed() bool {
 	fmt.Println(time.Now(), "Is Closed atomic.LoadInt32")
-	b = (atomic.LoadInt32(&c.closed) == 1)
+	b := (atomic.LoadInt32(&c.closed) == 1)
 	fmt.Println(time.Now(), "Is Closed atomic.LoadInt32")
 	return b
 }
