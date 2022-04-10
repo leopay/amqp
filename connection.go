@@ -360,13 +360,13 @@ func (c *Connection) send(f frame) error {
 	if c.IsClosed() {
 		return ErrClosed
 	}
-
+        fmt.Println(time.Now(), "lock writeframe")
 	c.sendM.Lock()
 	fmt.Println(time.Now(), "start writeframe")
 	err := c.writer.WriteFrame(f)
 	fmt.Println(time.Now(), "writeframe end")
 	c.sendM.Unlock()
-
+         fmt.Println(time.Now(), "unlock writeframe end")
 	if err != nil {
 		// shutdown could be re-entrant from signaling notify chans
 		go c.shutdown(&Error{
