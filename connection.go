@@ -572,7 +572,7 @@ func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
 			// When idle, fill the space with a heartbeat frame
 			t := at.Sub(lastSent)
 			fmt.Println(time.Now(), "cal sub")
-			t1 := interval - time.Seond
+			t1 := interval - time.Second
 			fmt.Println(time.Now(), "cat interval -time.Second")
 			t2 := t > t1
 			fmt.Println(time.Now(), "compare")
