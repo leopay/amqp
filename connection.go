@@ -360,6 +360,7 @@ func (c *Connection) IsClosed() bool {
 }
 
 func (c *Connection) send(f frame) error {
+	fmt.Println(time.Now(), "start sending")
 	if c.IsClosed() {
 		return ErrClosed
 	}
@@ -570,6 +571,7 @@ func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
                         fmt.Println(time.Now(), "send heartbeat")
 			// When idle, fill the space with a heartbeat frame
 			if at.Sub(lastSent) > interval-time.Second {
+				fmt.Println(time.Now(), "pre send")
 				if err := c.send(&heartbeatFrame{}); err != nil {
 					// send heartbeats even after close/closeOk so we
 					// tick until the connection starts erroring
