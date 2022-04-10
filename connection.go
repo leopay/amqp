@@ -566,13 +566,16 @@ func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
 				if err := c.send(&heartbeatFrame{}); err != nil {
 					// send heartbeats even after close/closeOk so we
 					// tick until the connection starts erroring
+					fmt.Println(time.Now(), "send heartbeat error", err)
 					return
 				}
+				fmt.Println(time.Now(), "send heartbeat finished")
 			}
 
 		case conn := <-c.deadlines:
 			// When reading, reset our side of the deadline, if we've negotiated one with
 			// a deadline that covers at least 2 server heartbeats
+			fmt.Println(time.Now(), "set deadlines")
 			if interval > 0 {
 				conn.SetReadDeadline(time.Now().Add(maxServerHeartbeatsInFlight * interval))
 			}
