@@ -355,7 +355,7 @@ func (c *Connection) closeWith(err *Error) error {
 func (c *Connection) IsClosed() bool {
 	start := time.Now()
 	defer func(start time.Time){
-		fmt.Println(time.Now(), "Is Closed atomic.LoadInt32", time.Now()-start)
+		fmt.Println(time.Now(), "Is Closed atomic.LoadInt32", time.Now().Sub(start))
 	}(start)
 	return (atomic.LoadInt32(&c.closed) == 1)
 }
