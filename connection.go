@@ -570,7 +570,13 @@ func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
 		case at := <-sendTicks:
                         fmt.Println(time.Now(), "send heartbeat")
 			// When idle, fill the space with a heartbeat frame
-			if at.Sub(lastSent) > interval-time.Second {
+			t := at.Sub(lastSent)
+			fmt.Println(time.Now(), "cal sub")
+			t1 := interval - time.Seond
+			fmt.Println(time.Now(), "cat interval -time.Second")
+			t2 := t > t1
+			fmt.Println(time.Now(), "compare")
+			if t2 {
 				fmt.Println(time.Now(), "pre send")
 				if err := c.send(&heartbeatFrame{}); err != nil {
 					// send heartbeats even after close/closeOk so we
