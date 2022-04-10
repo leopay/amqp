@@ -551,7 +551,7 @@ func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
 	for {
 		select {
 		case at, stillSending := <-c.sends:
-                        fmt.Println("stilling Sending")
+                        fmt.Println(time.Now(), "stilling Sending", stillSending, at)
 			// When actively sending, depend on sent frames to reset server timer
 			if stillSending {
 				lastSent = at
@@ -560,7 +560,7 @@ func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
 			}
 
 		case at := <-sendTicks:
-                        fmt.Println("send heartbeat")
+                        fmt.Println(time.Now(), "send heartbeat")
 			// When idle, fill the space with a heartbeat frame
 			if at.Sub(lastSent) > interval-time.Second {
 				if err := c.send(&heartbeatFrame{}); err != nil {
