@@ -362,7 +362,9 @@ func (c *Connection) send(f frame) error {
 	}
 
 	c.sendM.Lock()
+	fmt.Println(time.Now(), "start writeframe")
 	err := c.writer.WriteFrame(f)
+	fmt.Println(time.Now(), "writeframe end")
 	c.sendM.Unlock()
 
 	if err != nil {
@@ -375,9 +377,11 @@ func (c *Connection) send(f frame) error {
 		// Broadcast we sent a frame, reducing heartbeats, only
 		// if there is something that can receive - like a non-reentrant
 		// call or if the heartbeater isn't running
+		fmt.Println(time.Now(), "starting boardcast send a frame")
 		select {
 		case c.sends <- time.Now():
 		default:
+		fmt.Println(time.Now(), "boardcast send a frame")
 		}
 	}
 
