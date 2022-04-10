@@ -353,7 +353,7 @@ func (c *Connection) closeWith(err *Error) error {
 // IsClosed returns true if the connection is marked as closed, otherwise false
 // is returned.
 func (c *Connection) IsClosed() bool {
-	start = time.Now()
+	start := time.Now()
 	defer func(start time.Time){
 		fmt.Println(time.Now(), "Is Closed atomic.LoadInt32", time.Now()-start)
 	}(start)
