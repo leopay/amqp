@@ -353,24 +353,16 @@ func (c *Connection) closeWith(err *Error) error {
 // IsClosed returns true if the connection is marked as closed, otherwise false
 // is returned.
 func (c *Connection) IsClosed() bool {
-	fmt.Println(time.Now(), "Is Closed atomic.LoadInt32")
-	b := (atomic.LoadInt32(&c.closed) == 1)
-	fmt.Println(time.Now(), "Is Closed atomic.LoadInt32")
-	return b
+	return (atomic.LoadInt32(&c.closed) == 1)
 }
 
 func (c *Connection) send(f frame) error {
-	fmt.Println(time.Now(), "start sending")
 	if c.IsClosed() {
 		return ErrClosed
 	}
-        fmt.Println(time.Now(), "lock writeframe")
 	c.sendM.Lock()
-	fmt.Println(time.Now(), "start writeframe")
 	err := c.writer.WriteFrame(f)
-	fmt.Println(time.Now(), "writeframe end")
 	c.sendM.Unlock()
-         fmt.Println(time.Now(), "unlock writeframe end")
 	if err != nil {
 		// shutdown could be re-entrant from signaling notify chans
 		go c.shutdown(&Error{
@@ -381,11 +373,9 @@ func (c *Connection) send(f frame) error {
 		// Broadcast we sent a frame, reducing heartbeats, only
 		// if there is something that can receive - like a non-reentrant
 		// call or if the heartbeater isn't running
-		fmt.Println(time.Now(), "starting boardcast send a frame")
 		select {
 		case c.sends <- time.Now():
 		default:
-		fmt.Println(time.Now(), "boardcast send a frame")
 		}
 	}
 
@@ -567,33 +557,27 @@ func (c *Connection) heartbeater(interval time.Duration, done chan *Error) {
 				return
 			}
 
-		case at := <-sendTicks:
+                case at := <-sendTicks:
                         fmt.Println(time.Now(), "send heartbeat")
-			// When idle, fill the space with a heartbeat frame
-			t := at.Sub(lastSent)
-			fmt.Println(time.Now(), "cal sub")
-			t1 := interval - time.Second
-			fmt.Println(time.Now(), "cat interval -time.Second")
-			t2 := t > t1
-			fmt.Println(time.Now(), "compare")
-			if t2 {
-				fmt.Println(time.Now(), "pre send")
-				if err := c.send(&heartbeatFrame{}); err != nil {
-					// send heartbeats even after close/closeOk so we
-					// tick until the connection starts erroring
-					fmt.Println(time.Now(), "send heartbeat error", err)
-					return
-				}
-				fmt.Println(time.Now(), "send heartbeat finished")
-			}
+                        // When idle, fill the space with a heartbeat frame
+                        if at.Sub(lastSent) > interval - time.Second {
+                                fmt.Println(time.Now(), "pre send")
+                                if err := c.send(&heartbeatFrame{}); err != nil {
+                                        // send heartbeats even after close/closeOk so we
+                                        // tick until the connection starts erroring
+                                        fmt.Println(time.Now(), "send heartbeat error", err)
+                                        return
+                                }
+                        }
 
-		case conn := <-c.deadlines:
-			// When reading, reset our side of the deadline, if we've negotiated one with
-			// a deadline that covers at least 2 server heartbeats
-			fmt.Println(time.Now(), "set deadlines")
-			if interval > 0 {
-				conn.SetReadDeadline(time.Now().Add(maxServerHeartbeatsInFlight * interval))
-			}
+                case conn := <-c.deadlines:
+                        // When reading, reset our side of the deadline, if we've negotiated one with
+                        // a deadline that covers at least 2 server heartbeats
+                        fmt.Println(time.Now(), "set deadlines")
+                        if interval > 0 {
+                                conn.SetReadDeadline(time.Now().Add(maxServerHeartbeatsInFlight * interval))
+                        }
+                        fmt.Println(time.Now(), "set deadlines finished")
 
 		case <-done:
 			return
